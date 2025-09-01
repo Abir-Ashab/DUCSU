@@ -1,62 +1,61 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IUser extends Document {
-  ballotNumber: string;
-  name: string;
-  ballotName: string;
-  postalNumber?: string;
+  ballotNumber?: string;
+  name?: string;
+  designation?: string;
+  voteNumber?: string;
   registrationNumber?: string;
   department?: string;
   hall?: string;
-  designation: string;
+  Category?: string;
   photo?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface CreateUserRequest {
-  ballotNumber: string;
-  name: string;
-  ballotName: string;
-  postalNumber?: string;
+  ballotNumber?: string;
+  name?: string;
+  designation?: string;
+  voteNumber?: string;
   registrationNumber?: string;
   department?: string;
   hall?: string;
-  designation: string;
+  Category?: string;
 }
 
 export interface UpdateUserRequest {
   ballotNumber?: string;
   name?: string;
-  ballotName?: string;
-  postalNumber?: string;
+  designation?: string;
+  voteNumber?: string;
   registrationNumber?: string;
   department?: string;
   hall?: string;
-  designation?: string;
+  Category?: string;
 }
 
 const UserSchema: Schema = new Schema({
   ballotNumber: {
     type: String,
-    required: true,
+    required: false,
     trim: true
   },
   name: {
     type: String,
-    required: true,
+    required: false,
     trim: true
   },
-  ballotName: {
+  designation: {
     type: String,
-    required: true,
-    unique: true,
+    required: false,
     trim: true
   },
-  postalNumber: {
+  voteNumber: {
     type: String,
-    trim: true,
-    default: null
+    required: false,
+    trim: true
   },
   registrationNumber: {
     type: String,
@@ -73,10 +72,10 @@ const UserSchema: Schema = new Schema({
     trim: true,
     default: null
   },
-  designation: {
+  Category: {
     type: String,
-    required: true,
-    trim: true
+    trim: true,
+    default: null
   },
   photo: {
     type: String,

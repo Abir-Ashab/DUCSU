@@ -10,7 +10,6 @@ export class UserController {
     this.userRepository = new UserRepository();
   }
 
-  // Get all users
   getAllUsers = async (req: Request, res: Response): Promise<void> => {
     try {
       const users = await this.userRepository.findAll();
@@ -58,25 +57,7 @@ export class UserController {
 
   createUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { ballotNumber, name, ballotName, postalNumber, registrationNumber, department, hall, designation } = req.body as CreateUserRequest;
-
-      if (!ballotNumber || !name || !ballotName || !designation) {
-        res.status(400).json({
-          success: false,
-          message: 'Ballot number, name, ballot name, and designation are required'
-        });
-        return;
-      }
-
-      // Check if ballot name already exists
-      const existingUser = await this.userRepository.findByBallotName(ballotName);
-      if (existingUser) {
-        res.status(409).json({
-          success: false,
-          message: 'Ballot name already exists'
-        });
-        return;
-      }
+      const { ballotNumber, name, designation, voteNumber, registrationNumber, department, hall, Category } = req.body as CreateUserRequest;
 
       // Get photo URL from Cloudinary upload
       const photoUrl = req.file ? req.file.path : undefined;
@@ -84,12 +65,12 @@ export class UserController {
       const userData = {
         ballotNumber,
         name,
-        ballotName,
-        postalNumber,
+        designation,
+        voteNumber,
         registrationNumber,
         department,
         hall,
-        designation,
+        Category,
         photo: photoUrl
       };
 
@@ -113,7 +94,7 @@ export class UserController {
   updateUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      const { ballotNumber, name, ballotName, postalNumber, registrationNumber, department, hall, designation } = req.body as UpdateUserRequest;
+      const { ballotNumber, name, designation, voteNumber, registrationNumber, department, hall, Category } = req.body as UpdateUserRequest;
 
       // Check if user exists
       const existingUser = await this.userRepository.findById(id);
@@ -125,28 +106,17 @@ export class UserController {
         return;
       }
 
-      // Check if ballot name already exists (for other users)
-      if (ballotName && ballotName !== existingUser.ballotName) {
-        const userWithBallotName = await this.userRepository.findByBallotName(ballotName);
-        if (userWithBallotName) {
-          res.status(409).json({
-            success: false,
-            message: 'Ballot name already exists'
-          });
-          return;
-        }
-      }
 
       const updateData: UpdateUserRequest & { photo?: string } = {};
       
       if (ballotNumber) updateData.ballotNumber = ballotNumber;
       if (name) updateData.name = name;
-      if (ballotName) updateData.ballotName = ballotName;
-      if (postalNumber) updateData.postalNumber = postalNumber;
+      if (designation) updateData.designation = designation;
+      if (voteNumber) updateData.voteNumber = voteNumber;
       if (registrationNumber) updateData.registrationNumber = registrationNumber;
       if (department) updateData.department = department;
       if (hall) updateData.hall = hall;
-      if (designation) updateData.designation = designation;
+      if (Category) updateData.Category = Category;
 
       // Handle photo update
       if (req.file) {
@@ -156,7 +126,8 @@ export class UserController {
             const publicId = extractPublicIdFromUrl(existingUser.photo);
             await deleteFromCloudinary(`ducsu-users/${publicId}`);
           } catch (error) {
-            console.error('Error deleting old photo:', error);
+            console.error('Warning: Could not delete old photo from Cloudinary:', error);
+            // Don't throw error here - continue with update even if old photo deletion fails
           }
         }
         updateData.photo = req.file.path;
@@ -193,7 +164,6 @@ export class UserController {
         return;
       }
 
-      // Delete photo from Cloudinary if exists
       if (existingUser.photo) {
         try {
           const publicId = extractPublicIdFromUrl(existingUser.photo);

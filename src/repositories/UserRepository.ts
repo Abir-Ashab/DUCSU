@@ -13,12 +13,12 @@ export class UserRepository {
     const user = new User({
       ballotNumber: userData.ballotNumber,
       name: userData.name,
-      ballotName: userData.ballotName,
-      postalNumber: userData.postalNumber,
+      designation: userData.designation,
+      voteNumber: userData.voteNumber,
       registrationNumber: userData.registrationNumber,
       department: userData.department,
       hall: userData.hall,
-      designation: userData.designation,
+      Category: userData.Category,
       photo: userData.photo
     });
 
@@ -38,12 +38,12 @@ export class UserRepository {
     return result !== null;
   }
 
-  async findByBallotName(ballotName: string): Promise<IUser | null> {
-    return await User.findOne({ ballotName });
+  async findByVoteNumber(voteNumber: string): Promise<IUser | null> {
+    return await User.findOne({ voteNumber });
   }
 
-  async existsByBallotName(ballotName: string, excludeId?: string): Promise<boolean> {
-    const query: any = { ballotName };
+  async existsByVoteNumber(voteNumber: string, excludeId?: string): Promise<boolean> {
+    const query: any = { voteNumber };
     if (excludeId) {
       query._id = { $ne: excludeId };
     }

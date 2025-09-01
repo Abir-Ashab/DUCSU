@@ -4,9 +4,25 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { connectDatabase } from './config/database';
+import { initializeCloudinary } from './config/cloudinary';
 import userRoutes from './routes/userRoutes';
 
-dotenv.config();
+const result = dotenv.config();
+if (result.error) {
+  console.error('Error loading .env file:', result.error);
+} else {
+  console.log('✅ Environment variables loaded successfully');
+}
+
+// Initialize Cloudinary after environment variables are loaded
+initializeCloudinary();
+
+// Debug environment variables
+console.log('Environment check:');
+console.log('PORT:', process.env.PORT);
+console.log('CLOUDINARY_CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME ? 'Set' : 'Not set');
+console.log('CLOUDINARY_API_KEY:', process.env.CLOUDINARY_API_KEY ? 'Set' : 'Not set');
+console.log('CLOUDINARY_API_SECRET:', process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Not set');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
